@@ -1,0 +1,18 @@
+# Dependencies and build outputs
+vendor/
+node_modules
+build/
+dist/
+
+# Local logbook data. On Clever Cloud this folder is the FS Bucket mount point,
+# and it must not exist in the repository, or the bucket is not mounted.
+data/
+
+# Environment and Clever Cloud link
+.env*
+!.env.example
+.clever.json
+
+# OS files
+.DS_Store
+Thumbs.db

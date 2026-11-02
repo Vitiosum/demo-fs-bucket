@@ -1,0 +1,406 @@
+/* ==========================================================================
+   The Ship's Logbook: a logbook laid open on a portolan chart.
+   Above deck (paper, iron-gall ink, wax) tells the story; below deck
+   (the dark panel, monospace) shows the FS Bucket at work.
+   The Clever frame (top bar, platform panel, footer) comes from cc-brand.css.
+   ========================================================================== */
+
+:root {
+  --chart-line: rgba(217, 183, 122, 0.075);
+  --chart-line-major: rgba(217, 183, 122, 0.13);
+  --brass: #d6b77f;
+  --parchment-on-sea: #dccca6;
+
+  --paper: #e9d7ae;
+  --paper-hi: #f4e8c8;
+  --ink: #2a1b10;          /* dried iron-gall ink */
+  --ink-wet: #1f2c66;      /* the same ink, fresh from the pen */
+  --ink-2: #5d3f25;
+  --ink-faint: rgba(42, 27, 16, 0.42);
+  --rule-red: rgba(158, 46, 40, 0.55);
+  --rule-blue: rgba(56, 82, 132, 0.2);
+  --leather: #3a171c;
+
+  --wax-0: #b3123f;        /* one colour of sealing wax per instance */
+  --wax-1: #4f4cab;
+  --wax-2: #0d8576;
+  --wax-3: #b98700;
+  --wax-4: #29336e;
+  --wax-local: #8a5428;
+
+  --fell: "IM Fell English", "Iowan Old Style", Georgia, serif;
+  --fell-sc: "IM Fell English SC", "IM Fell English", Georgia, serif;
+  --hand: "La Belle Aurore", "Segoe Script", "Bradley Hand", cursive;
+
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .33 0 0 0 0 .22 0 0 0 0 .1 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --mottle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='640'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011' numOctaves='3' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .33 0 0 0 0 .12 0 0 0 -1.6 .9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)' opacity='.32'/%3E%3C/svg%3E");
+}
+
+.defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- The sea chart ---------- */
+.sea { position: relative; overflow: hidden; isolation: isolate; }
+.portolan { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+.portolan__lines line { stroke: var(--chart-line); stroke-width: 1; }
+.portolan__lines line.major { stroke: var(--chart-line-major); }
+.portolan__rose { color: rgba(217, 183, 122, 0.2); }
+
+.voyage { padding-top: clamp(20px, 4vw, 40px); padding-bottom: 8px; }
+.chart-note {
+  max-width: 62ch; margin: 0 0 clamp(18px, 3vw, 28px);
+  font-family: var(--fell); font-style: italic; font-size: clamp(17px, 1.6vw, 20px); line-height: 1.5;
+  color: var(--parchment-on-sea);
+}
+.alarm {
+  margin: 0 0 20px; padding: 12px 16px; border-radius: 10px;
+  border: 1px solid rgba(203, 28, 66, 0.5); background: rgba(203, 28, 66, 0.14); color: #ffb3c0; font-weight: 600;
+}
+
+/* ---------- The book ---------- */
+.book {
+  position: relative; display: grid; grid-template-columns: 1fr 1fr;
+  padding: 14px; border-radius: 12px;
+  background: radial-gradient(120% 90% at 25% 15%, #5a252c 0%, var(--leather) 55%, #22090d 100%);
+  box-shadow:
+    0 50px 90px rgba(2, 4, 14, 0.6), 0 10px 24px rgba(2, 4, 14, 0.5),
+    inset 0 0 0 1px rgba(255, 220, 200, 0.07), inset 0 0 40px rgba(0, 0, 0, 0.55);
+}
+.book::after { /* the gutter where the two pages dive into the spine */
+  content: ""; position: absolute; top: 14px; bottom: 14px; left: 50%; width: 70px; transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(70, 40, 12, 0.22) 38%, rgba(36, 18, 4, 0.5) 50%, rgba(70, 40, 12, 0.22) 62%, transparent);
+  pointer-events: none;
+}
+
+.page, .slip {
+  position: relative; color: var(--ink);
+  background-color: var(--paper);
+  background-image:
+    var(--grain), var(--mottle),
+    radial-gradient(circle at 14% 88%, rgba(150, 98, 38, 0.18) 0 1.4%, transparent 5%),
+    radial-gradient(circle at 87% 9%, rgba(150, 98, 38, 0.14) 0 1%, transparent 4%),
+    radial-gradient(ellipse at 50% 42%, var(--paper-hi) 0%, transparent 72%);
+}
+.page {
+  padding: clamp(22px, 3.4vw, 46px) clamp(18px, 3vw, 42px) clamp(28px, 3.4vw, 48px);
+  box-shadow: inset 0 0 90px rgba(128, 82, 28, 0.36), inset 0 0 16px rgba(110, 68, 22, 0.32);
+}
+.page--verso {
+  border-radius: 5px 2px 2px 5px;
+  box-shadow: inset 0 0 90px rgba(128, 82, 28, 0.36), inset 0 0 16px rgba(110, 68, 22, 0.32),
+    -1px 1px 0 #d6bf8c, -2px 2px 0 #b89a64, -3px 3px 0 #d6bf8c, -4px 4px 0 #a98a56;
+}
+.page--recto {
+  border-radius: 2px 5px 5px 2px;
+  box-shadow: inset 0 0 90px rgba(128, 82, 28, 0.36), inset 0 0 16px rgba(110, 68, 22, 0.32),
+    1px 1px 0 #d6bf8c, 2px 2px 0 #b89a64, 3px 3px 0 #d6bf8c, 4px 4px 0 #a98a56;
+}
+.page :focus-visible, .slip :focus-visible { outline: 2px solid var(--wax-0); outline-offset: 3px; }
+
+.page h2, .slip h2 { font-family: var(--fell); font-weight: 400; font-size: clamp(23px, 2.2vw, 27px); line-height: 1.15; }
+
+/* ---------- Masthead ---------- */
+.masthead { padding-bottom: 18px; border-bottom: 4px double var(--ink-2); margin-bottom: 26px; }
+.masthead__kicker { font-family: var(--fell); font-style: italic; font-size: 17px; color: var(--ink-2); }
+.masthead h1 {
+  margin-top: 4px; font-family: var(--fell); font-weight: 400;
+  font-size: clamp(42px, 5.2vw, 68px); line-height: 0.98; letter-spacing: -0.01em;
+  text-shadow: 0 0 1px rgba(42, 27, 16, 0.35);
+}
+.masthead__sub { margin-top: 10px; font-family: var(--fell); font-style: italic; font-size: clamp(16px, 1.5vw, 19px); color: var(--ink-2); max-width: 40ch; }
+.masthead__state {
+  display: flex; gap: 14px; align-items: flex-start; margin-top: 18px;
+  font-family: var(--fell); font-size: 17px; line-height: 1.45; max-width: 52ch;
+}
+.masthead__state .wax-mark { width: 38px; height: 38px; margin-top: 2px; }
+
+/* ---------- Wax ---------- */
+.wax-mark { flex: none; width: 20px; height: 20px; filter: drop-shadow(0 1px 1px rgba(50, 10, 15, 0.45)); }
+.wax--0 { color: var(--wax-0); }
+.wax--1 { color: var(--wax-1); }
+.wax--2 { color: var(--wax-2); }
+.wax--3 { color: var(--wax-3); }
+.wax--4 { color: var(--wax-4); }
+.wax--local { color: var(--wax-local); }
+
+/* ---------- The entry form ---------- */
+.entry-form { display: grid; gap: 6px; }
+.entry-form h2 { margin-bottom: 8px; }
+.field-label { display: block; font-family: var(--fell); font-style: italic; font-size: 16px; color: var(--ink-2); padding: 0; }
+.field-hint { font-family: var(--fell); font-size: 14px; color: var(--ink-faint); text-align: right; }
+
+.ink-lines {
+  width: 100%; min-height: 136px; resize: vertical; padding: 1px 10px 0 14px;
+  font-family: var(--hand); font-size: 22px; line-height: 34px; color: var(--ink-wet);
+  background: repeating-linear-gradient(180deg, transparent 0 33px, var(--rule-blue) 33px 34px);
+  background-attachment: local;
+  border: 0; border-left: 2px solid var(--rule-red); border-radius: 0;
+}
+.ink-lines::placeholder, .ink-input::placeholder { color: rgba(42, 27, 16, 0.32); }
+.ink-lines:focus, .ink-input:focus, .ink-select:focus { outline: none; box-shadow: 0 2px 0 -0.5px var(--wax-0); }
+
+.form-grid { display: grid; grid-template-columns: 184px 1fr; gap: 10px 26px; align-items: start; margin-top: 8px; }
+.form-col { display: grid; gap: 6px; }
+.form-col .field-label { margin-top: 6px; }
+.ink-input, .ink-select {
+  width: 100%; padding: 2px 2px 4px; border: 0; border-bottom: 1.5px dotted var(--ink-2); border-radius: 0;
+  background: transparent; color: var(--ink-wet);
+}
+.ink-input { font-family: var(--hand); font-size: 21px; line-height: 1.5; }
+.ink-select {
+  appearance: none; -webkit-appearance: none; padding-right: 28px; font-family: var(--fell); font-size: 19px; color: var(--ink); cursor: pointer;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='%235d3f25' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M6 9l6 6 6-6'/></svg>") right 4px center / 16px no-repeat;
+}
+
+/* The compass rose is the wind picker: eight radio buttons around it. */
+.windrose { border: 0; margin: 0; padding: 0; min-width: 0; }
+.windrose__dial { position: relative; width: 176px; height: 176px; margin-top: 6px; }
+.windrose__rose { position: absolute; left: 33px; top: 33px; width: 110px; height: 110px; color: var(--ink-faint); transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 1); }
+.windrose__point {
+  position: absolute; display: grid; place-items: center; width: 36px; height: 36px; margin: -18px 0 0 -18px;
+  font-family: var(--fell-sc); font-size: 15px; color: var(--ink-2); cursor: pointer;
+  border: 1.5px solid transparent; border-radius: 52% 46% 55% 47%;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.windrose__point:hover { color: var(--ink); border-color: var(--ink-faint); }
+.windrose__input:checked + .windrose__point { color: var(--wax-0); border-color: var(--wax-0); font-weight: 700; }
+.windrose__input:focus-visible + .windrose__point { outline: 2px solid var(--wax-0); outline-offset: 2px; }
+.windrose__point--n { left: 88px; top: 16px; }
+.windrose__point--ne { left: 139px; top: 37px; }
+.windrose__point--e { left: 160px; top: 88px; }
+.windrose__point--se { left: 139px; top: 139px; }
+.windrose__point--s { left: 88px; top: 160px; }
+.windrose__point--sw { left: 37px; top: 139px; }
+.windrose__point--w { left: 16px; top: 88px; }
+.windrose__point--nw { left: 37px; top: 37px; }
+/* the rose turns its north point towards the chosen wind */
+.windrose:has(#wind-NE:checked) .windrose__rose { transform: rotate(45deg); }
+.windrose:has(#wind-E:checked) .windrose__rose { transform: rotate(90deg); }
+.windrose:has(#wind-SE:checked) .windrose__rose { transform: rotate(135deg); }
+.windrose:has(#wind-S:checked) .windrose__rose { transform: rotate(180deg); }
+.windrose:has(#wind-SW:checked) .windrose__rose { transform: rotate(225deg); }
+.windrose:has(#wind-W:checked) .windrose__rose { transform: rotate(270deg); }
+.windrose:has(#wind-NW:checked) .windrose__rose { transform: rotate(315deg); }
+
+.sketch-drop {
+  position: relative; display: grid; gap: 2px; padding: 12px 14px; cursor: pointer;
+  border: 1.5px dashed rgba(93, 63, 37, 0.55); border-radius: 3px;
+  font-family: var(--fell); transition: background 0.15s ease;
+}
+.sketch-drop:hover { background: rgba(93, 63, 37, 0.06); }
+.sketch-drop:focus-within { outline: 2px solid var(--wax-0); outline-offset: 3px; }
+.sketch-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.sketch-drop__name { font-size: 17px; color: var(--ink); overflow-wrap: anywhere; }
+.sketch-drop__hint { font-size: 14px; font-style: italic; color: var(--ink-2); }
+
+.form-error {
+  margin-top: 8px; padding: 8px 0 8px 14px; border-left: 3px solid var(--wax-0);
+  font-family: var(--fell); font-style: italic; font-size: 17px; color: #8e1430;
+}
+
+.seal-button {
+  display: inline-flex; align-items: center; gap: 14px; justify-self: start; margin-top: 12px; padding: 0;
+  border: 0; background: none; cursor: pointer; color: var(--ink); text-align: left;
+}
+.seal-button__wax {
+  width: 86px; height: 86px; filter: drop-shadow(0 4px 3px rgba(60, 8, 20, 0.45));
+  transition: transform 0.18s ease;
+}
+.seal-button:hover .seal-button__wax { transform: rotate(-8deg) scale(1.04); }
+.seal-button:active .seal-button__wax { transform: scale(0.92); }
+.seal-button__text { font-family: var(--fell); font-style: italic; font-size: 24px; line-height: 1.1; }
+.seal-button__text small { display: block; margin-top: 4px; font-style: normal; font-size: 14px; color: var(--ink-2); }
+.seal-button[disabled] { cursor: progress; }
+.is-sealing .seal-button__wax { animation: press 0.9s ease-in-out infinite; }
+@keyframes press { 50% { transform: scale(0.86) rotate(-10deg); } }
+
+/* ---------- The watch roll (boot.log) ---------- */
+.watch-roll { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--rule-red); }
+.file-note { margin-top: 6px; font-family: var(--fell); font-style: italic; font-size: 15px; color: var(--ink-2); max-width: 52ch; }
+.roll { list-style: none; margin-top: 14px; display: grid; gap: 2px; }
+.roll__line {
+  display: grid; grid-template-columns: 20px 86px 1fr auto; gap: 10px; align-items: center; padding: 5px 0 5px 8px;
+  font-family: var(--fell); font-size: 16px; border-bottom: 1px solid var(--rule-blue); border-left: 2px solid transparent;
+}
+.roll__line time { color: var(--ink-2); }
+.roll__who { overflow-wrap: anywhere; }
+.roll__deploy { font-family: var(--fell-sc); font-size: 13px; color: var(--ink-faint); }
+.roll__line.is-current { border-left-color: var(--wax-0); }
+.roll__line.is-current .roll__deploy::after { content: ", this voyage"; font-family: var(--fell); font-style: italic; color: var(--wax-0); }
+.roll__storm { display: flex; align-items: center; gap: 10px; padding: 6px 0 6px 8px; font-family: var(--fell); font-style: italic; font-size: 15px; color: #8e2a26; }
+.roll__storm svg { width: 96px; height: 10px; flex: none; }
+.roll__storm path { fill: none; stroke: #8e2a26; stroke-width: 1.4; stroke-linecap: round; }
+
+/* ---------- The log table ---------- */
+.log { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.log th {
+  padding: 0 8px 8px; text-align: left; font-family: var(--fell-sc); font-weight: 400; font-size: 16px; color: var(--ink-2);
+  border-bottom: 4px double var(--rule-red);
+}
+.log th:nth-child(1) { width: 64px; }
+.log th:nth-child(2) { width: 68px; }
+.log td { padding: 12px 8px 14px; vertical-align: top; border-bottom: 1px solid var(--rule-blue); }
+.log td + td, .log th + th { border-left: 1px solid var(--rule-red); }
+.entry__hour time { display: block; white-space: pre-line; font-family: var(--hand); font-size: 17px; line-height: 1.35; color: var(--ink); }
+.entry__winds { font-family: var(--hand); font-size: 20px; line-height: 1.2; }
+.entry__winds small { display: block; margin-top: 4px; font-family: var(--fell); font-style: italic; font-size: 14px; color: var(--ink-2); }
+.entry__text { font-family: var(--hand); font-size: 20px; line-height: 1.5; overflow-wrap: anywhere; }
+.entry__sign { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 4px 14px; margin-top: 10px; }
+.entry__name { font-family: var(--hand); font-size: 19px; line-height: 1.3; overflow-wrap: anywhere; }
+.entry__name::before { content: "\2014\00a0"; }
+.entry__via { display: inline-flex; align-items: center; gap: 6px; font-family: var(--fell); font-style: italic; font-size: 14px; color: var(--ink-2); }
+
+.tipped-in { margin: 12px 0 2px; width: min(100%, 300px); transform: rotate(-1.3deg); }
+.entry:nth-child(even) .tipped-in { transform: rotate(1deg); }
+.tipped-in img {
+  width: 100%; height: auto; border: 6px solid #f6eed8; border-bottom-width: 7px;
+  box-shadow: 0 3px 8px rgba(70, 44, 14, 0.38), 0 0 0 1px rgba(70, 44, 14, 0.1);
+  filter: sepia(0.25) saturate(0.9);
+}
+.tipped-in figcaption { margin-top: 6px; font-family: var(--fell); font-style: italic; font-size: 13px; color: var(--ink-2); overflow-wrap: anywhere; }
+
+.page-foot { margin-top: 14px; font-family: var(--fell); font-style: italic; font-size: 15px; color: var(--ink-2); }
+.empty-note { margin-top: 14px; font-family: var(--fell); font-style: italic; font-size: 16px; color: var(--ink-2); }
+.folio { position: absolute; right: clamp(18px, 3vw, 42px); bottom: 16px; font-family: var(--fell); font-style: italic; font-size: 15px; color: var(--ink-2); }
+
+/* A freshly sealed entry: the wax is pressed, the ink is still blue-black and oxidises to brown. */
+.entry.is-fresh { animation: candle 4s ease-out both; }
+.entry.is-fresh .entry__via .wax-mark { width: 42px; height: 42px; animation: stamp 0.75s cubic-bezier(0.2, 0.9, 0.3, 1.25) 0.25s both; }
+.entry.is-fresh .entry__text, .entry.is-fresh .entry__name, .entry.is-fresh .entry__winds { animation: oxidise 5s ease-out 0.6s both; }
+@keyframes stamp {
+  0% { transform: scale(2.4) rotate(-28deg); opacity: 0; }
+  55% { transform: scale(0.9) rotate(5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-8deg); opacity: 1; }
+}
+@keyframes oxidise { from { color: var(--ink-wet); } to { color: var(--ink); } }
+@keyframes candle { from { background: rgba(255, 236, 178, 0.75); } to { background: transparent; } }
+
+/* ---------- On the chart table, below the book ---------- */
+.deck { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 28px; margin-top: 44px; align-items: start; }
+.deck--crew { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin-top: 28px; }
+
+.slip {
+  padding: 28px clamp(18px, 2.6vw, 30px) 26px; border-radius: 3px;
+  box-shadow: inset 0 0 50px rgba(128, 82, 28, 0.32), 0 18px 40px rgba(2, 4, 14, 0.45), 0 3px 8px rgba(2, 4, 14, 0.4);
+}
+.slip::before { /* a strip of old tape */
+  content: ""; position: absolute; top: -11px; left: 50%; width: 110px; height: 24px; transform: translateX(-50%) rotate(-2deg);
+  background: rgba(236, 222, 186, 0.62); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+.manifest { transform: rotate(-0.5deg); }
+.hail { transform: rotate(0.4deg); }
+.slip__lead { margin-top: 6px; font-family: var(--fell); font-style: italic; font-size: 16px; color: var(--ink-2); }
+
+.manifest__body { display: grid; gap: 16px; margin-top: 16px; }
+.plimsoll { display: grid; grid-template-columns: 200px 1fr; gap: 18px; align-items: center; margin: 0; }
+.plimsoll svg { width: 200px; height: auto; }
+.plimsoll__sea { fill: rgba(44, 92, 124, 0.35); }
+.plimsoll__hull { fill: #1c2045; stroke: var(--ink); stroke-width: 2; }
+.plimsoll__planks { stroke: rgba(222, 221, 238, 0.1); stroke-width: 1; fill: none; }
+.plimsoll__water { fill: rgba(44, 104, 138, 0.9); }
+.plimsoll__wave { fill: none; stroke: #2c5d7c; stroke-width: 1.6; }
+.plimsoll__deck { stroke: var(--ink); stroke-width: 4; stroke-linecap: round; }
+.plimsoll__mark { fill: none; stroke: #f4e8c8; stroke-width: 2.4; }
+.plimsoll figcaption { font-family: var(--fell); font-size: 15px; line-height: 1.4; color: var(--ink-2); }
+.plimsoll figcaption strong { display: block; font-weight: 400; font-size: 24px; color: var(--ink); }
+
+.manifest__files { display: grid; gap: 4px; font-family: var(--fell); min-width: 0; }
+.manifest__files details { border-bottom: 1px solid var(--rule-blue); }
+.manifest__files summary {
+  display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; cursor: pointer; font-size: 16px; list-style: none;
+}
+.manifest__files summary::-webkit-details-marker { display: none; }
+.manifest__files summary::before { content: "+"; width: 14px; color: var(--wax-0); flex: none; }
+.manifest__files details[open] summary::before { content: "\2212"; }
+.manifest__folder { flex: 1; font-family: var(--fell-sc); overflow-wrap: anywhere; }
+.manifest__files ul { list-style: none; padding: 0 0 10px 14px; display: grid; gap: 3px; }
+.manifest__files li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 12px; font-size: 14px; color: var(--ink-2); }
+.manifest__name { color: var(--ink); overflow-wrap: anywhere; }
+.manifest__more { font-style: italic; }
+
+/* Below deck: the machinery. Frame typography, because this part is the platform talking. */
+.below-deck {
+  position: relative; padding: 26px clamp(18px, 2.6vw, 28px); border-radius: 14px;
+  background: linear-gradient(180deg, #0b0e20, #10142c); border: 1px solid var(--cc-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 18px 40px rgba(2, 4, 14, 0.45);
+  color: var(--cc-text-2); min-width: 0;
+}
+.below-deck h2 { font-family: var(--fell); font-weight: 400; font-size: clamp(23px, 2.2vw, 27px); color: var(--brass); }
+.below-deck h3 { margin-top: 18px; font-size: 13px; font-weight: 700; color: var(--cc-text); }
+.below-deck__lead { margin-top: 6px; font-size: 14px; color: var(--cc-muted); }
+.below-deck__mount {
+  margin-top: 14px; padding: 10px 12px; border-radius: 8px; background: rgba(222, 221, 238, 0.04); border: 1px dashed var(--cc-border-strong);
+  font-family: var(--cc-mono); font-size: 12.5px; line-height: 1.6; overflow-wrap: anywhere;
+}
+.ops { list-style: none; margin-top: 8px; display: grid; gap: 1px; font-family: var(--cc-mono); font-size: 12.5px; }
+.ops li {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "call ms" "path detail";
+  column-gap: 14px; row-gap: 1px; padding: 7px 0; border-bottom: 1px solid rgba(222, 221, 238, 0.06);
+}
+.op__call { grid-area: call; color: var(--cc-orange); white-space: nowrap; }
+.op__path { grid-area: path; color: #5fe3d3; overflow-wrap: anywhere; }
+.op__detail { grid-area: detail; color: var(--cc-muted); text-align: right; }
+.op__ms { grid-area: ms; color: var(--cc-muted); white-space: nowrap; text-align: right; }
+.below-deck__mount .op__call, .below-deck__mount .op__path { white-space: normal; }
+.below-deck__total { margin-top: 12px; font-size: 13px; color: var(--cc-muted); }
+.seal-ops { margin-top: 6px; padding: 2px 12px 8px; border-left: 2px solid var(--cc-orange); background: rgba(245, 116, 97, 0.06); }
+
+/* Hail the watches */
+.ink-button {
+  margin-top: 16px; padding: 9px 20px; border: 3px double var(--ink-2); border-radius: 3px; background: transparent; cursor: pointer;
+  font-family: var(--fell); font-style: italic; font-size: 19px; color: var(--ink);
+  transition: background 0.15s ease;
+}
+.ink-button:hover { background: rgba(93, 63, 37, 0.08); }
+.ink-button[disabled] { cursor: progress; opacity: 0.6; }
+.hail__replies { list-style: none; margin-top: 14px; display: grid; gap: 2px; font-family: var(--fell); font-size: 15px; }
+.hail__replies li { display: grid; grid-template-columns: 20px 1fr auto; gap: 10px; align-items: center; padding: 4px 0; border-bottom: 1px solid var(--rule-blue); }
+.hail__replies small { font-style: italic; color: var(--ink-2); }
+.hail__summary { margin-top: 12px; font-family: var(--fell); font-style: italic; font-size: 17px; }
+
+.deck--crew .cc-platform { align-self: stretch; }
+
+/* ---------- Footer: Clever Cloud Academy badge ---------- */
+.foot-cert { display: flex; align-items: center; gap: 16px; color: var(--cc-text-2); }
+.foot-cert svg { width: 92px; height: 92px; flex: none; animation: none; filter: drop-shadow(0 8px 16px rgba(165, 16, 80, 0.35)); }
+.foot-cert strong { display: block; font-size: 15px; color: var(--cc-text); }
+.foot-cert span { font-size: 13px; }
+.foot-cert:hover strong { color: var(--cc-orange); }
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 1020px) {
+  .book { grid-template-columns: 1fr; gap: 12px; padding: 10px; }
+  .book::after { display: none; }
+  .page--verso, .page--recto { border-radius: 4px; }
+}
+@media (max-width: 860px) {
+  .deck, .deck--crew { grid-template-columns: minmax(0, 1fr); }
+  .manifest, .hail { transform: none; }
+}
+@media (max-width: 560px) {
+  .book { padding: 7px; border-radius: 9px; }
+  .page { padding: 22px 16px 34px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .windrose__dial { margin-inline: auto; }
+  .roll__line { grid-template-columns: 18px 1fr; row-gap: 0; }
+  .roll__who, .roll__deploy { grid-column: 2; }
+  .log thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .log, .log tbody, .log tr, .log td { display: block; }
+  .log tr { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--rule-red); }
+  .log td { padding: 0; border: 0; }
+  .log td + td { border-left: 0; }
+  .entry__hour time { white-space: normal; font-size: 16px; }
+  .entry__winds { display: flex; gap: 8px; align-items: baseline; font-size: 17px; }
+  .entry__winds small { margin-top: 0; }
+  .entry__remarks { grid-column: 1 / -1; margin-top: 8px; }
+  .plimsoll { grid-template-columns: 1fr; gap: 10px; }
+  .plimsoll svg { width: 100%; max-width: 240px; }
+  .manifest__files li { grid-template-columns: minmax(0, 1fr) auto; }
+  .manifest__files li time { grid-column: 1 / -1; }
+  .ops li { grid-template-areas: "call ms" "path path" "detail detail"; }
+  .op__detail { text-align: left; }
+  .foot-cert svg { width: 72px; height: 72px; }
+}

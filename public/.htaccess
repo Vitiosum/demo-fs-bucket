@@ -1,0 +1,10 @@
+# Apache on Clever Cloud (web root: CC_WEBROOT=/public).
+DirectorySlash Off
+RewriteEngine On
+
+# Never serve dotfiles (.user.ini, .htaccess).
+RewriteRule (^|/)\. - [F]
+
+# Every path that is not a real file goes to the front controller.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]
